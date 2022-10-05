@@ -1,4 +1,5 @@
-<?php  
+<?php
+
 /*********** CITATIONS ALÉATOIRES *********************************************/
 /**
  * Génère et retourne une citation aléatoire.
@@ -6,13 +7,15 @@
  * @param string $section : Identifiant de la page pour laquelle on veut une 
  * citation.
  * 
+ * @param string $langue : Sigle de la langue de la citation à utiliser.
+ * 
  * @return array : Tableau contenant l'auteur et le texte d'une citation.
  */
-function obtenirCitationAleatoire($section) 
+function obtenirCitationAleatoire($section, $langue)
 {
-    $citationsJson = file_get_contents('data/citations-' . $section . '.json');
+    $citationsJson = file_get_contents("data/citations-$section-$langue.json");
     $citations = json_decode($citationsJson, true);
-    $positionAleatoire = rand(0, count($citations)-1);
+    $positionAleatoire = rand(0, count($citations) - 1);
     $citation = $citations[$positionAleatoire];
     return $citation;
 }
@@ -24,15 +27,15 @@ function obtenirCitationAleatoire($section)
  *
  * @return array : Tableau contenant les sigles des langues.
  */
-function obtenirLanguesDisponibles() 
+function obtenirLanguesDisponibles()
 {
     // Les langues disponibles sont dans le dossier i18n   
     $i18n = scandir('i18n/');
 
     // On filtre le '.' et '..' 
     $languesDisponibles = [];
-    foreach($i18n as $elt) {
-        if($elt !== '.' && $elt !== '..') {
+    foreach ($i18n as $elt) {
+        if ($elt !== '.' && $elt !== '..') {
             $languesDisponibles[] = $elt;
         }
     }
@@ -48,18 +51,18 @@ function obtenirLanguesDisponibles()
  * 
  * @return string : Sigle d'une des langues supportées.
  */
-function determinerLangue($langueParDefaut, $languesDispos) {
+function determinerLangue($langueParDefaut, $languesDispos)
+{
     $lan = $langueParDefaut;
 
-    if(isset($_COOKIE['leila-langue']) && in_array($_COOKIE['leila-langue'], $languesDispos)) {
+    if (isset($_COOKIE['leila-langue']) && in_array($_COOKIE['leila-langue'], $languesDispos)) {
         $lan = $_COOKIE['leila-langue'];
     }
 
-    if(isset($_GET['langue']) && in_array($_GET['langue'], $languesDispos)) {
+    if (isset($_GET['langue']) && in_array($_GET['langue'], $languesDispos)) {
         $lan = $_GET['langue'];
-        $expiration = time() + 60 * 60 * 24 * 50; 
+        $expiration = time() + 60 * 60 * 24 * 50;
         setcookie('leila-langue', $lan, $expiration);
     }
     return $lan;
 }
-?>
